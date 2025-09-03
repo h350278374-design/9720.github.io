@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机点名系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        textarea {
+            height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 16px;
+            line-height: 1.5;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4b6cb7;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+        }
+        
+        .secondary-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .danger-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .success-btn {
+            background: #1dd1a1;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .timer-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        input[type="number"] {
+            width: 70px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            height: 300px;
+            position: relative;
+        }
+        
+        .result-circle {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            word-break: break-all;
+        }
+        
+        .result-hide-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        .congratulations {
+            animation: congratulations 1s ease infinite;
+        }
+        
+        @keyframes congratulations {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .hidden {
+            filter: blur(8px);
+            user-select: none;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 50px;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            flex: 1;
+            font-weight: bold;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #f0f0f0;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .file-label:hover {
+            background: #e0e0e0;
+        }
+        
+        .selected-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .selected-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+        
+        .selected-item {
+            background: #4b6cb7;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .result-circle {
+                width: 180px;
+                height: 180px;
+                font-size: 24px;
+            }
+        }
+        
+        .import-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .blurred-text {
+            filter: blur(5px);
+            transition: filter 0.3s ease;
+        }
+        
+        .clear-selected-btn {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>随机点名系统</h1>
+            <p class="subtitle">公平、随机、高效的点名工具</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="card">
+                    <div class="input-area">
+                        <h3><i class="fas fa-users"></i> 名单输入</h3>
+                        <textarea id="nameList" placeholder="请输入名单，每行一个名字">王同学
+李同学
+张同学
+刘同学
+陈同学
+杨同学
+周同学
+吴同学
+黄同学
+徐同学
+孙同学
+马同学
+朱同学
+胡同学
+林同学
+郭同学
+郑同学
+高同学
+罗同学
+梁同学
+谢同学</textarea>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="primary-btn" id="startBtn">
+                            <i class="fas fa-play"></i><span>开始</span>
+                        </button>
+                        <button class="secondary-btn" id="pauseBtn" disabled>
+                            <i class="fas fa-pause"></i><span>暂停</span>
+                        </button>
+                        <button class="danger-btn" id="clearListBtn">
+                            <i class="fas fa-trash"></i><span>清除名单</span>
+                        </button>
+                        <label class="file-label">
+                            <input type="file" id="fileInput" class="file-input" accept=".xlsx, .xls, .csv">
+                            <i class="fas fa-file-excel"></i><span>导入Excel</span>
+                        </label>
+                        <button class="secondary-btn" id="hideInputBtn">
+                            <i class="fas fa-eye-slash"></i><span>隐藏名单</span>
+                        </button>
+                    </div>
+                    
+                    <p class="import-info">支持Excel、CSV或文本文件，每行一个名字</p>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-cog"></i> 设置</h3>
+                    
+                    <div class="timer-control">
+                        <h4>倒计时设置：</h4>
+                        <input type="number" id="countdownTime" min="1" max="60" value="5">
+                        <span>秒</span>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="success-btn" id="countdownBtn">
+                            <i class="fas fa-clock"></i><span>倒计时开始</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" data-mode="random">
+                            <i class="fas fa-random"></i> 纯随机模式
+                        </button>
+                        <button class="mode-btn" data-mode="filter">
+                            <i class="fas fa-filter"></i> 筛除模式
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="card">
+                    <div class="result-container">
+                        <h3><i class="fas fa-star"></i> 抽取结果</h3>
+                        <div class="result-circle" id="resultDisplay">
+                            等待开始
+                        </div>
+                        <button class="secondary-btn result-hide-btn" id="hideResultBtn">
+                            <i class="fas fa-eye-slash"></i><span>隐藏结果</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="selected-list">
+                        <div class="selected-header">
+                            <h3><i class="fas fa-list"></i> 已抽取名单</h3>
+                            <div>
+                                <button class="secondary-btn" id="hideSelectedBtn">
+                                    <i class="fas fa-eye-slash"></i><span>隐藏已抽名单</span>
+                                </button>
+                                <button class="danger-btn clear-selected-btn" id="clearSelectedBtn">
+                                    <i class="fas fa-trash"></i><span>清除已抽名单</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="selected-items" id="selectedList">
+                            <!-- 已选中的名单将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>随机点名系统 &copy; 2099 - 😎爱鲲指定工具</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const nameListTextarea = document.getElementById('nameList');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const clearListBtn = document.getElementById('clearListBtn');
+            const clearSelectedBtn = document.getElementById('clearSelectedBtn');
+            const countdownBtn = document.getElementById('countdownBtn');
+            const hideInputBtn = document.getElementById('hideInputBtn');
+            const hideResultBtn = document.getElementById('hideResultBtn');
+            const hideSelectedBtn = document.getElementById('hideSelectedBtn');
+            const fileInput = document.getElementById('fileInput');
+            const countdownTime = document.getElementById('countdownTime');
+            const selectedList = document.getElementById('selectedList');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            
+            // 变量初始化
+            let nameList = [];
+            let filteredList = [];
+            let selectedNames = [];
+            let isRunning = false;
+            let intervalId = null;
+            let countdownId = null;
+            let currentMode = 'random';
+            let isInputHidden = false;
+            let isResultHidden = false;
+            let isSelectedHidden = false;
+            let currentSelectedName = '';
+            
+            // 模式切换
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modeButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMode = this.dataset.mode;
+                    
+                    // 重置筛选列表
+                    updateFilteredList();
+                });
+            });
+            
+            // 更新筛选列表
+            function updateFilteredList() {
+                const names = getNamesFromTextarea();
+                if (currentMode === 'filter') {
+                    filteredList = names.filter(name => !selectedNames.includes(name));
+                } else {
+                    filteredList = [...names];
+                }
+            }
+            
+            // 从文本区域获取名字列表
+            function getNamesFromTextarea() {
+                return nameListTextarea.value.split('\n')
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0);
+            }
+            
+            // 开始随机选择
+            function startRandom() {
+                if (filteredList.length === 0) {
+                    alert('名单为空或所有名字已被抽取！');
+                    return;
+                }
+                
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                
+                intervalId = setInterval(() => {
+                    const randomIndex = Math.floor(Math.random() * filteredList.length);
+                    currentSelectedName = filteredList[randomIndex];
+                    
+                    // 即使隐藏结果，抽取过程中也显示名字
+                    resultDisplay.textContent = currentSelectedName;
+                }, 100);
+            }
+            
+            // 暂停选择
+            function pauseRandom() {
+                if (!isRunning) return;
+                
+                isRunning = false;
+                clearInterval(intervalId);
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                
+                // 如果隐藏结果，显示***
+                if (isResultHidden) {
+                    resultDisplay.textContent = '***';
+                }
+                
+                // 添加到已选列表
+                if (currentSelectedName && !selectedNames.includes(currentSelectedName)) {
+                    selectedNames.push(currentSelectedName);
+                    addToSelectedList(currentSelectedName);
+                }
+                
+                // 更新筛选列表
+                updateFilteredList();
+                
+                // 添加恭喜动画
+                resultDisplay.classList.add('congratulations');
+                setTimeout(() => {
+                    resultDisplay.classList.remove('congratulations');
+                }, 2000);
+            }
+            
+            // 添加到已选列表
+            function addToSelectedList(name) {
+                const span = document.createElement('span');
+                span.className = 'selected-item';
+                
+                // 如果已选名单处于隐藏状态，显示***
+                if (isSelectedHidden) {
+                    span.textContent = '***';
+                } else {
+                    span.textContent = name;
+                }
+                
+                span.setAttribute('data-name', name); // 保存原始名字
+                selectedList.appendChild(span);
+            }
+            
+            // 倒计时开始
+            function startCountdown() {
+                if (isRunning) return;
+                
+                const seconds = parseInt(countdownTime.value);
+                if (isNaN(seconds) || seconds <= 0) {
+                    alert('请输入有效的倒计时时间！');
+                    return;
+                }
+                
+                startRandom();
+                
+                // 禁用按钮
+                countdownBtn.disabled = true;
+                
+                // 设置倒计时
+                let timeLeft = seconds;
+                countdownBtn.innerHTML = `<i class="fas fa-clock"></i><span>倒计时: ${timeLeft}秒</span>`;
+                
+                countdownId = setInterval(() => {
+                    timeLeft--;
+                    countdownBtn.innerHTML = `<i class="fas fa-clock"></i><span>倒计时: ${timeLeft}秒</span>`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownId);
+                        pauseRandom();
+                        countdownBtn.innerHTML = `<i class="fas fa-clock"></i><span>倒计时开始</span>`;
+                        countdownBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+            
+            // 清除名单
+            function clearNameList() {
+                nameListTextarea.value = '';
+                updateFilteredList();
+            }
+            
+            // 清除已选名单
+            function clearSelectedList() {
+                selectedNames = [];
+                selectedList.innerHTML = '';
+                updateFilteredList();
+            }
+            
+            // 隐藏/显示输入名单
+            function toggleInputHide() {
+                isInputHidden = !isInputHidden;
+                
+                if (isInputHidden) {
+                    hideInputBtn.innerHTML = '<i class="fas fa-eye"></i><span>显示名单</span>';
+                    nameListTextarea.classList.add('blurred-text');
+                } else {
+                    hideInputBtn.innerHTML = '<i class="fas fa-eye-slash"></i><span>隐藏名单</span>';
+                    nameListTextarea.classList.remove('blurred-text');
+                }
+            }
+            
+            // 隐藏/显示抽取结果
+            function toggleResultHide() {
+                isResultHidden = !isResultHidden;
+                
+                if (isResultHidden) {
+                    hideResultBtn.innerHTML = '<i class="fas fa-eye"></i><span>显示结果</span>';
+                    // 如果当前不是运行中，显示***
+                    if (!isRunning && resultDisplay.textContent !== '等待开始') {
+                        resultDisplay.textContent = '***';
+                    }
+                } else {
+                    hideResultBtn.innerHTML = '<i class="fas fa-eye-slash"></i><span>隐藏结果</span>';
+                    // 如果不是运行中，显示实际名字
+                    if (!isRunning && resultDisplay.textContent === '***') {
+                        resultDisplay.textContent = currentSelectedName || '等待开始';
+                    }
+                }
+            }
+            
+            // 隐藏/显示已选名单
+            function toggleSelectedHide() {
+                isSelectedHidden = !isSelectedHidden;
+                
+                if (isSelectedHidden) {
+                    hideSelectedBtn.innerHTML = '<i class="fas fa-eye"></i><span>显示已抽名单</span>';
+                    // 将所有已选名字替换为***
+                    selectedList.querySelectorAll('.selected-item').forEach(item => {
+                        item.textContent = '***';
+                    });
+                } else {
+                    hideSelectedBtn.innerHTML = '<i class="fas fa-eye-slash"></i><span>隐藏已抽名单</span>';
+                    // 恢复原始名字
+                    selectedList.querySelectorAll('.selected-item').forEach(item => {
+                        item.textContent = item.getAttribute('data-name');
+                    });
+                }
+            }
+            
+            // 初始化事件监听
+            startBtn.addEventListener('click', startRandom);
+            pauseBtn.addEventListener('click', pauseRandom);
+            clearListBtn.addEventListener('click', clearNameList);
+            clearSelectedBtn.addEventListener('click', clearSelectedList);
+            countdownBtn.addEventListener('click', startCountdown);
+            hideInputBtn.addEventListener('click', toggleInputHide);
+            hideResultBtn.addEventListener('click', toggleResultHide);
+            hideSelectedBtn.addEventListener('click', toggleSelectedHide);
+            
+            // 文件导入处理
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 简单处理：假设CSV文件或Excel可以直接读取为文本
+                    // 实际应用中可能需要使用专门的库如SheetJS处理Excel文件
+                    nameListTextarea.value = e.target.result;
+                    updateFilteredList();
+                };
+                reader.readAsText(file);
+            });
+            
+            // 初始化名单
+            updateFilteredList();
+        });
+    </script>
+</body>
+</html>
